@@ -1,0 +1,7 @@
+masters:
+  hosts:
+    master:
+nodes:
+  hosts:
+    node-0:
+    node-1:

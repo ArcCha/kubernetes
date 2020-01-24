@@ -1,0 +1,6 @@
+---
+- name: reload kernel modules
+  systemd:
+    name: systemd-modules-load
+    state: restarted
+  become: yes

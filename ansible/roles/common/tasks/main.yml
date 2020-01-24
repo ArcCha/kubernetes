@@ -1,0 +1,101 @@
+---
+- name: add docker ce repo
+  yum_repository:
+    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+    description: Docker CE repo
+    name: docker_ce
+    state: present 
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
+- name: add ip modules necessary for kubernetes
+  copy:
+    src: files/modules-load-kubernetes.conf
+    dest: /etc/modules-load.d/kubernetes.conf
+  become: yes
+  notify:
+    - reload kernel modules
+# - debug: msg="trigger reload modules"
+#   notify: reload kernel modules
+#   changed_when: true
+- meta: flush_handlers
+# refactor into loops
+- name: configure ipv4 iptables
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  become: yes
+- name: configure ipv6 iptables
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  become: yes
+- name: add kubernetes repo
+  yum_repository:
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/
+    description: Kubernetes repo
+    name: kubernetes
+    state: present
+    gpgkey:
+      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  become: yes
+- name: set permissive mode for selinux
+  selinux:
+    policy: targeted
+    state: permissive
+  become: yes
+- name: disable swap
+  command: swapoff -a
+  become: yes
+- name: disable ipv6 resolution for yum
+  ini_file:
+    path: /etc/yum.conf
+    section: main
+    option: ip_resolve
+    value: '4'
+  become: yes
+- name: install kubernetes and docker
+  yum: 
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+  become: yes
+  environment:
+    https_proxy: https://192.168.70.1:8080
+# https://stackoverflow.com/questions/22472168/whats-the-easy-way-to-auto-create-non-existing-dir-in-ansible
+# TODO refactor out path
+- name: create directory for docker proxy config
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    recurse: yes
+    state: directory
+  become: yes
+- name: configure proxy for docker
+  copy:
+    src: files/docker-https-proxy.conf
+    dest: /etc/systemd/system/docker.service.d/https-proxy.conf
+  become: yes
+- name: enable docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+  become: yes
+- name: enable kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+  become: yes
+

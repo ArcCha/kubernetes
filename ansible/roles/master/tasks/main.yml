@@ -1,0 +1,16 @@
+---
+- name: download calico manifest
+  get_url:
+    url: https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+    dest: "{{ansible_env.HOME}}/calico.yaml"
+  environment:
+    https_proxy: https://192.168.70.1:8080
+- name: download calicoctl
+  get_url:
+    url: https://github.com/projectcalico/calicoctl/releases/download/v3.11.2/calicoctl
+    dest: "{{ansible_env.HOME}}/calicoctl"
+    mode: 0700
+  environment:
+    https_proxy: https://192.168.70.1:8080
+    
+
