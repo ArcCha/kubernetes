@@ -12,5 +12,8 @@
     mode: 0700
   environment:
     https_proxy: https://192.168.70.1:8080
-    
+- name: install vim
+  yum:
+    name: vim
+    state: latest
 
