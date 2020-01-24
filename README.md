@@ -14,9 +14,14 @@ You need to have installed:
 ```
 cd terraform
 terraform apply
-# TODO virsh restart domains
-# TODO terraform apply once more to set hostnames
+# run once again to set hostnames
+terraform apply
+sudo virsh reboot kubernetes-master
+sudo virsh reboot node-0
+sudo virsh reboot node-1
 ```
+
+You may need to refresh your DNS configuration.
 
 ## Provision VMs
 
