@@ -7,4 +7,8 @@ resource "libvirt_network" "k8s" {
   dhcp {
     enabled = true
   }
+  dns {
+    enabled    = true
+    local_only = true
+  }
 }
