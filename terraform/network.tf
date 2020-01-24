@@ -10,5 +10,8 @@ resource "libvirt_network" "k8s" {
   dns {
     enabled    = true
     local_only = true
+    forwarders {
+      address = "192.168.132.45"
+    }
   }
 }
