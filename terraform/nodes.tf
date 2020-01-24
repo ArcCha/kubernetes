@@ -1,7 +1,7 @@
 resource "libvirt_domain" "master" {
   name   = "kubernetes-master"
   memory = "1024"
-  vcpu   = 1
+  vcpu   = 2
 
   cloudinit = libvirt_cloudinit_disk.commoninit.id
 
