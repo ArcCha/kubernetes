@@ -1,0 +1,15 @@
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: my-pool-0
+spec:
+  cidr: 10.3.0.0/27
+  blockSize: 29
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: my-pool-1
+spec:
+  cidr: 10.3.0.32/27
+  blockSize: 29
+

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment-0
+  labels:
+    app: hello-0
+spec:
+  replicas: 2
+    selector:
+      matchLabels:
+        app: hello-0
+    template:
+      metadata:
+        labels:
+          app: hello-0
+      annotations:
+        cni.projectcalico.org/ipv4pools: "[\"my-pool-0\"]"
+      spec:
+        containers:
+          - name: hello-node
+            image: gcr.io/hello-minikube-zero-install/hello-node
+
