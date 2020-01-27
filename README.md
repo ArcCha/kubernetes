@@ -11,6 +11,8 @@ You need to have installed:
 
 ## Spin up VMs
 
+Swap default ssh key with your public key in `terraform/templates/cloud_init.yml`.
+
 ```
 cd terraform
 terraform apply
@@ -24,6 +26,8 @@ sudo virsh reboot node-1
 You may need to refresh your DNS configuration.
 
 ## Provision VMs
+
+Be sure to configure NSS to use libvirt module in order to resolve guest vm hostnames properly. [Sample configuration](https://wiki.archlinux.org/index.php/Libvirt#Access_virtual_machines_using_their_hostnames) from ArchWiki.
 
 ```
 ansible-playbook site.yml -i inventory.yml
