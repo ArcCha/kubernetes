@@ -1,6 +1,6 @@
 resource "libvirt_domain" "master" {
   name   = "kubernetes-master"
-  memory = "1024"
+  memory = "4096"
   vcpu   = 2
 
   cloudinit = libvirt_cloudinit_disk.commoninit.id
@@ -31,7 +31,7 @@ resource "libvirt_domain" "master" {
 resource "libvirt_domain" "node" {
   count  = 2
   name   = "node-${count.index}"
-  memory = "1024"
+  memory = "2048"
   vcpu   = 1
 
   cloudinit = libvirt_cloudinit_disk.commoninit.id
