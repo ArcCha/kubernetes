@@ -11,3 +11,7 @@ system_info:
     shell: /bin/bash
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDL1lEUlK5smejUYfT/To2fKAI97/HFFBtlKzqDO9tAyMjob5YMfPQRnHesT68MVGRzAOMUKQxND4Nfgw/dWk5Qd/I9yttWBNLWb733f4ewJ1DrGAC1eEcXM3l3PLhsSqgy/p7IvzkJN0kxzzgJjMiSYaWyarmWPUDkxQtsKcxBXzEeptJZo88zRL0qTHYPfmij6w4nHrB90w2jr/Bo5SI367fak+Dc/JgGxAAwz53ymiABWppNAfXY0PNi3rslsAcVWQwVWxECA46otsR4DvGqEUd+WAgLvQvp5beAZr5Wj+hoi/WX/qkuxk8hVC2AnlyFyqdaHb9hocB3nvd3eCmQwXt/aCvr9XdXC4hDHygnjfJjdSzk/D0bbhbZ0GDK6yevcKrHDEJ43Pe8hEusf58WQqDrmvA3tYqlesca/RGYtcrI8/Fn1tov4L/1GtKKrnbvBqEEsjs0YOg/+PWsunAy+YP2yAG4/qYcdhyEye0LtSxJJ376YpjQ9TqFFrTofn8= ap2@DA31-AP2-S01
+run_cmd:
+  - sed -i -e 's/#UseDNS\ yes/UseDNS\ no/g' /etc/ssh/sshd_config
+  - systemctl restart sshd
+
