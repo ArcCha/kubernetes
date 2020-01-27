@@ -4,3 +4,8 @@
     name: systemd-modules-load
     state: restarted
   become: yes
+- name: restart networking
+  systemd:
+    name: network
+    state: restarted
+  become: yes

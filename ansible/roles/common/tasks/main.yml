@@ -1,4 +1,26 @@
 ---
+# - name: set up dns
+#   lineinfile:
+#     path: /etc/sysconfig/network-scripts/ifcfg-eth0
+#     regexp: '^DNS1='
+#     line: DNS1=10.0.0.1
+#   notify: restart networking
+#   become: yes
+# - name: set up secondary dns
+#   lineinfile:
+#     path: /etc/sysconfig/network-scripts/ifcfg-eth0
+#     regexp: '^DNS2='
+#     line: DNS2=192.168.88.1
+#   notify: restart networking
+#   become: yes
+- name: add ip modules necessary for kubernetes
+  copy:
+    src: files/modules-load-kubernetes.conf
+    dest: /etc/modules-load.d/kubernetes.conf
+  become: yes
+  notify:
+    - reload kernel modules
+- meta: flush_handlers
 - name: add docker ce repo
   yum_repository:
     baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
@@ -7,17 +29,6 @@
     state: present 
     gpgkey: https://download.docker.com/linux/centos/gpg
   become: yes
-- name: add ip modules necessary for kubernetes
-  copy:
-    src: files/modules-load-kubernetes.conf
-    dest: /etc/modules-load.d/kubernetes.conf
-  become: yes
-  notify:
-    - reload kernel modules
-# - debug: msg="trigger reload modules"
-#   notify: reload kernel modules
-#   changed_when: true
-- meta: flush_handlers
 # refactor into loops
 - name: configure ipv4 iptables
   sysctl:
@@ -27,9 +38,9 @@
     state: present
     reload: yes
   become: yes
-- name: configure ipv6 iptables
+- name: configure ipv4 forwarding
   sysctl:
-    name: net.bridge.bridge-nf-call-ip6tables
+    name: net.ipv4.ip_forward
     value: '1'
     sysctl_set: yes
     state: present

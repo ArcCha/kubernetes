@@ -16,4 +16,7 @@
   yum:
     name: vim
     state: latest
-
+  become: yes
+- name: pull docker images
+  command: kubeadm config images pull
+  become: yes
