@@ -1,5 +1,5 @@
 resource "libvirt_domain" "master" {
-  name   = "kubernetes-master"
+  name   = "master"
   memory = "4096"
   vcpu   = 2
 
@@ -9,18 +9,6 @@ resource "libvirt_domain" "master" {
     network_id     = libvirt_network.k8s.id
     hostname       = "master"
     wait_for_lease = true
-  }
-
-  console {
-    type        = "pty"
-    target_port = "0"
-    target_type = "serial"
-  }
-
-  console {
-    type        = "pty"
-    target_port = "1"
-    target_type = "virtio"
   }
 
   disk {
