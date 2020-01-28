@@ -18,7 +18,7 @@ cd terraform
 terraform apply
 # run once again to set hostnames
 terraform apply
-sudo virsh reboot kubernetes-master
+sudo virsh reboot master
 sudo virsh reboot node-0
 sudo virsh reboot node-1
 ```
