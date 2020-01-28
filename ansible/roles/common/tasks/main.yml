@@ -1,18 +1,4 @@
 ---
-# - name: set up dns
-#   lineinfile:
-#     path: /etc/sysconfig/network-scripts/ifcfg-eth0
-#     regexp: '^DNS1='
-#     line: DNS1=10.0.0.1
-#   notify: restart networking
-#   become: yes
-# - name: set up secondary dns
-#   lineinfile:
-#     path: /etc/sysconfig/network-scripts/ifcfg-eth0
-#     regexp: '^DNS2='
-#     line: DNS2=192.168.88.1
-#   notify: restart networking
-#   become: yes
 - name: add ip modules necessary for kubernetes
   copy:
     src: files/modules-load-kubernetes.conf
@@ -21,40 +7,35 @@
   notify:
     - reload kernel modules
 - meta: flush_handlers
-- name: add docker ce repo
+- name: add docker and kubernetes repositories
   yum_repository:
-    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
-    description: Docker CE repo
-    name: docker_ce
+    baseurl: "{{ item.baseurl }}"
+    description: "{{ item.description }}"
+    name: "{{ item.name }}"
     state: present 
-    gpgkey: https://download.docker.com/linux/centos/gpg
+    gpgkey: "{{ item.gpgkey }}"
+  loop:
+    - baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+      description: Docker CE repo
+      name: docker_ce
+      gpgkey: https://download.docker.com/linux/centos/gpg
+    - baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/
+      description: Kubernetes repo
+      name: kubernetes
+      gpgkey:
+        - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
   become: yes
-# refactor into loops
-- name: configure ipv4 iptables
+- name: configure kernel ipv4 parameters
   sysctl:
-    name: net.bridge.bridge-nf-call-iptables
+    name: "{{ item }}"
     value: '1'
     sysctl_set: yes
     state: present
     reload: yes
-  become: yes
-- name: configure ipv4 forwarding
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-    reload: yes
-  become: yes
-- name: add kubernetes repo
-  yum_repository:
-    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/
-    description: Kubernetes repo
-    name: kubernetes
-    state: present
-    gpgkey:
-      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.ipv4.ip_forward
   become: yes
 - name: set permissive mode for selinux
   selinux:
@@ -85,28 +66,31 @@
   environment:
     https_proxy: https://192.168.70.1:8080
 # https://stackoverflow.com/questions/22472168/whats-the-easy-way-to-auto-create-non-existing-dir-in-ansible
-# TODO refactor out path
 - name: create directory for docker proxy config
   file:
-    path: /etc/systemd/system/docker.service.d/
+    path: "{{ docker_service_d_path }}"
     recurse: yes
     state: directory
   become: yes
 - name: configure proxy for docker
   copy:
     src: files/docker-https-proxy.conf
-    dest: /etc/systemd/system/docker.service.d/https-proxy.conf
+    dest: "{{ docker_service_d_path }}/https-proxy.conf"
   become: yes
-- name: enable docker
+- name: enable docker and kubelet services
   systemd:
-    name: docker
+    name: "{{ item }}"
     enabled: yes
     state: started
+  loop:
+    - docker
+    - kubelet
   become: yes
-- name: enable kubelet
-  systemd:
-    name: kubelet
-    enabled: yes
-    state: started
-  become: yes
+- name: download calicoctl
+  get_url:
+    url: https://github.com/projectcalico/calicoctl/releases/download/v3.11.2/calicoctl
+    dest: "{{ansible_env.HOME}}/calicoctl"
+    mode: 0700
+  environment:
+    https_proxy: https://192.168.70.1:8080
 
