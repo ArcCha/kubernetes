@@ -89,8 +89,14 @@
 - name: download calicoctl
   get_url:
     url: https://github.com/projectcalico/calicoctl/releases/download/v3.11.2/calicoctl
-    dest: "{{ansible_env.HOME}}/calicoctl"
+    dest: "{{ ansible_env.HOME }}/calicoctl"
     mode: 0700
   environment:
     https_proxy: https://192.168.70.1:8080
-
+- name: configure calicoctl
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^export {{ calico_datastore }}$"
+    line: "export {{ calico_datastore }}"
+  tags:
+    - test
