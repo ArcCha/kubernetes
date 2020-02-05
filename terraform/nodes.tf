@@ -64,3 +64,26 @@ resource "libvirt_domain" "vbs-1" {
 output "vbs-1_ip" {
   value = libvirt_domain.vbs-1.network_interface.0.addresses
 }
+
+
+resource "libvirt_domain" "registry" {
+  name   = "registry"
+  memory = "1024"
+  vcpu   = 1
+
+  cloudinit = libvirt_cloudinit_disk.commoninit.id
+
+  network_interface {
+    network_id     = libvirt_network.k8s.id
+    hostname       = "registry"
+    wait_for_lease = true
+  }
+
+  disk {
+    volume_id = libvirt_volume.registry.id
+  }
+}
+
+output "registry_ip" {
+  value = libvirt_domain.registry.network_interface.0.addresses
+}

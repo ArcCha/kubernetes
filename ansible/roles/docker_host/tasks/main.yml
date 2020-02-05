@@ -1,0 +1,42 @@
+---
+- name: add docker repository
+  yum_repository:
+    baseurl: "{{ item.baseurl }}"
+    description: "{{ item.description }}"
+    name: "{{ item.name }}"
+    state: present
+    gpgkey: "{{ item.gpgkey }}"
+  loop:
+    - baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+      description: Docker CE repo
+      name: docker_ce
+      gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
+- name: install docker
+  yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+    state: present
+  become: yes
+  environment:
+    https_proxy: https://192.168.70.1:8080
+- name: create directory for docker proxy config
+  file:
+    path: "{{ docker_service_d_path }}"
+    recurse: yes
+    state: directory
+  become: yes
+- name: configure proxy for docker
+  copy:
+    src: files/docker-https-proxy.conf
+    dest: "{{ docker_service_d_path }}/https-proxy.conf"
+  become: yes
+- name: enable docker
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - docker
+  become: yes

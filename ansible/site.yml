@@ -1,7 +1,28 @@
 ---
-- hosts: all
+- hosts: nodes
   roles:
+    - docker_host
     - common
 - hosts: masters
   roles:
+    - docker_host
+    - common
     - master
+- hosts: vbses
+  roles:
+    - role: bertvv.mariadb
+      mariadb_bind_address: '0.0.0.0'
+      mariadb_databases:
+        - name: bookstack
+      mariadb_root_password: 'TODO'
+      mariadb_users:
+        - name: bookstack
+          password: 'TODO'
+          priv: 'bookstack.*:ALL'
+          host: '%.%.%.%'
+      become: yes
+      environment:
+        https_proxy: https://192.168.70.1:8080
+- hosts: registries
+  roles:
+    - docker_host

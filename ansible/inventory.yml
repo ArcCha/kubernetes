@@ -9,3 +9,9 @@ all:
       hosts:
         node-0:
         node-1:
+    vbses:
+      hosts:
+        vbs-1:
+    registries:
+      hosts:
+        registry:

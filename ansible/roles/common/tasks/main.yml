@@ -7,7 +7,7 @@
   notify:
     - reload kernel modules
 - meta: flush_handlers
-- name: add docker and kubernetes repositories
+- name: add kubernetes repositories
   yum_repository:
     baseurl: "{{ item.baseurl }}"
     description: "{{ item.description }}"
@@ -15,10 +15,6 @@
     state: present
     gpgkey: "{{ item.gpgkey }}"
   loop:
-    - baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
-      description: Docker CE repo
-      name: docker_ce
-      gpgkey: https://download.docker.com/linux/centos/gpg
     - baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/
       description: Kubernetes repo
       name: kubernetes
@@ -52,38 +48,24 @@
     option: ip_resolve
     value: '4'
   become: yes
-- name: install kubernetes and docker
+- name: install kubernetes
   yum:
     name:
       - kubelet
       - kubeadm
       - kubectl
-      - docker-ce
-      - docker-ce-cli
       - containerd.io
     state: present
   become: yes
   environment:
     https_proxy: https://192.168.70.1:8080
 # https://stackoverflow.com/questions/22472168/whats-the-easy-way-to-auto-create-non-existing-dir-in-ansible
-- name: create directory for docker proxy config
-  file:
-    path: "{{ docker_service_d_path }}"
-    recurse: yes
-    state: directory
-  become: yes
-- name: configure proxy for docker
-  copy:
-    src: files/docker-https-proxy.conf
-    dest: "{{ docker_service_d_path }}/https-proxy.conf"
-  become: yes
-- name: enable docker and kubelet services
+- name: kubelet services
   systemd:
     name: "{{ item }}"
     enabled: yes
     state: started
   loop:
-    - docker
     - kubelet
   become: yes
 - name: download calicoctl
