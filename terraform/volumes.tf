@@ -28,3 +28,10 @@ resource "libvirt_volume" "node" {
   pool           = "kubernetes"
   base_volume_id = libvirt_volume.centos7_cloud.id
 }
+
+resource "libvirt_volume" "vbs" {
+  count          = 1
+  name           = "vbs-${count.index}.qcow2"
+  pool           = "kubernetes"
+  base_volume_id = libvirt_volume.centos7_cloud.id
+}
