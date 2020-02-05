@@ -1,4 +1,3 @@
 ---
 docker_service_d_path: /etc/systemd/system/docker.service.d/
-calico_datastore: DATASTORE_TYPE=kubernetes KUBECONFIG=~/.kube/config 
-
+calico_datastore: DATASTORE_TYPE=kubernetes KUBECONFIG=~/.kube/config

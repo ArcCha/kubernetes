@@ -12,7 +12,7 @@
     baseurl: "{{ item.baseurl }}"
     description: "{{ item.description }}"
     name: "{{ item.name }}"
-    state: present 
+    state: present
     gpgkey: "{{ item.gpgkey }}"
   loop:
     - baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
@@ -53,7 +53,7 @@
     value: '4'
   become: yes
 - name: install kubernetes and docker
-  yum: 
+  yum:
     name:
       - kubelet
       - kubeadm

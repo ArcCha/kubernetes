@@ -7,4 +7,3 @@ spec:
   selector:
     app: hello-0
   type: ClusterIP
-

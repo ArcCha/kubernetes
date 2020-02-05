@@ -9,4 +9,3 @@ spec:
   asNumber: 64567
   serviceClusterIPs:
   - cidr: 10.4.0.0/16
-
