@@ -12,6 +12,3 @@ all:
     vbses:
       hosts:
         vbs-1:
-    registries:
-      hosts:
-        registry:
