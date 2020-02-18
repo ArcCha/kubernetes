@@ -1,3 +1,8 @@
+variable "ssh_key_pub" {
+  type        = string
+  description = "SSH key to inject into cloud init template."
+}
+
 resource "libvirt_pool" "kubernetes" {
   name = "kubernetes"
   type = "dir"
@@ -13,7 +18,7 @@ resource "libvirt_volume" "centos7_cloud" {
 resource "libvirt_cloudinit_disk" "commoninit" {
   name      = "commoninit.iso"
   pool      = libvirt_pool.kubernetes.name
-  user_data = file("${path.module}/templates/cloud_init.tmpl")
+  user_data = templatefile("${path.module}/templates/cloud_init.tmpl", { key = var.ssh_key_pub })
 }
 
 resource "libvirt_volume" "master" {
@@ -32,12 +37,6 @@ resource "libvirt_volume" "node" {
 resource "libvirt_volume" "vbs" {
   count          = 1
   name           = "vbs-${count.index}.qcow2"
-  pool           = "kubernetes"
-  base_volume_id = libvirt_volume.centos7_cloud.id
-}
-
-resource "libvirt_volume" "registry" {
-  name           = "registry.qcow2"
   pool           = "kubernetes"
   base_volume_id = libvirt_volume.centos7_cloud.id
 }

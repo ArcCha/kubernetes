@@ -11,7 +11,8 @@ You need to have installed:
 
 ## Spin up VMs
 
-Swap default ssh key with your public key in `terraform/templates/cloud_init.yml`.
+Public ssh key is expected to be provided as a root module variable.
+You can set it using environment variable `TF_VAR_ssh_key_pub`.
 
 ```
 cd terraform
@@ -47,7 +48,7 @@ ansible-playbook site.yml -i inventory.yml
 Master initialization
 
 ```
-sudo kubeadm init --pod-network-cidr=10.1.0.0/16 --service-cidr=10.3.0.0/16
+sudo kubeadm init --pod-network-cidr=10.1.0.0/16 --service-cidr=10.4.0.0/16
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
